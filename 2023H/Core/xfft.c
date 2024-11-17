@@ -49,7 +49,7 @@ void FFT_DIS(float *p_phase0)
 		max_index1 = max_index1 ^ max_index2;
 	}
 
-	// printf("%.0f\r\n", (max_index1) * 1000 * 640.0 / FFT_LENGTH);
+	
 	// printf("%.0f\r\n", (max_index2) * 1000 * 640.0 / FFT_LENGTH);
 
 	// float32_t rate = q1[3 * max_index1].real / q1[max_index1].real;
