@@ -170,12 +170,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  float32_t phase0=0;
+  int index1 = 0, index2 = 0,deltaphase = 0,mode = 0;
   while (1)
   {
     adc_init();
     FFT_Init();
-    FFT_DIS(&phase0);
+    FFT_DIS(&index1, &index2, &deltaphase, &mode);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

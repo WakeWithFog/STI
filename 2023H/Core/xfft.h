@@ -13,6 +13,6 @@ void FFT_Init(void);
 
 unsigned char FFT(Complex *x,int m);
 
-void FFT_DIS(float *p_phase0);
+void FFT_DIS(int *index1, int *index2, int *deltaphase, int *mode);
 
 #endif

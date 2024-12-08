@@ -5,7 +5,7 @@ __attribute__((section(".ARM.__at_0x24000000")));
 ALIGN_32BYTES(Complex q1[FFT_LENGTH])
 __attribute__((section(".ARM.__at_0x24040000")));
 
-void FFT_DIS(float *p_phase0)
+void FFT_DIS(int *index1, int *index2, int *deltaphase, int *mode0)
 {
 	//	for(uint32_t i=1550; i<6750; i++)
 	//	for(uint32_t i = 0; i < FFT_LENGTH; i++)
@@ -55,38 +55,64 @@ void FFT_DIS(float *p_phase0)
 	// float32_t rate = q1[3 * max_index1].real / q1[max_index1].real;
 	// if (max_index2/3==max_index1)
 	// 	rate = q1[3 * max_index2].real / q1[max_index2].real;
-	if (max_index1 * 3 != max_index2)
-		mod_max += 3 * (max_index1) * 640.0 / FFT_LENGTH;
-
-	*p_phase0 += 10/*这里的参数（现在是10）需要调整*/ * 360.0; // ((max_index1) * 1000 * 640.0 / FFT_LENGTH);
-	while (*p_phase0 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2) >= 4096)
-		*p_phase0 -= 360;
-	float32_t phase1, phase2;
-	phase1 = *p_phase0;
-	phase2 = *p_phase0 + phase;
-	while (phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2) < 0) //- (max_index1) * 6 * 640.0 / FFT_LENGTH
-		phase1 += 360;
-	while (phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2) >= 4096)
-		phase1 -= 360;
-	while (phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2) < 0) //- (max_index1) * 6 * 640.0 / FFT_LENGTH
-		phase2 += 360;
-	while (phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2) >= 4096)
-		phase2 -= 360;
-
-	if (mod_max > 1550 )
-	// if (mod_max > 1450 - 3 * (max_index1) * 640.0 / FFT_LENGTH)
-		// printf("%f sin\r\n", mod_max);
-		printf("255 %.0f %.0f 1 %.0f %.0f\r\n",		(max_index1) * 1000 * 640.0 / FFT_LENGTH, 
-													(max_index2) * 1000 * 640.0 / FFT_LENGTH, 
-													phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2),
-													phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2));
+	float rate = q1[3 * max_index2].real / q1[max_index2].real;
+	u8 mode1, mode2;
+	if (rate < 0.025)
+		mode2 = 1; // 正弦波
 	else
-		// printf("%f triangle\r\n", mod_max);
-		printf("255 %.0f %.0f 0 %.0f %.0f\r\n", 	(max_index1) * 1000 * 640.0 / FFT_LENGTH, 
-													(max_index2) * 1000 * 640.0 / FFT_LENGTH, 
-													phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2),
-													phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2));
+		mode2 = 0; // 三角波
+	if (max_index2 != 3 * max_index1)
+	{
+		rate = q1[3 * max_index1].real / q1[max_index1].real;
+		if (rate < 0.025)
+			mode1 = 1; // 正弦波
+		else
+			mode1 = 0; // 三角波
+	}
+	else
+	{
+		rate = q1[5 * max_index1].real / q1[max_index1].real;
+		if (rate < 0.01)
+			mode1 = 1; // 正弦波
+		else
+			mode1 = 0; // 三角波
+	}
 
+	if (*index1 != max_index1 || *index2 != max_index2 || *deltaphase != phase || *mode0 != mode2*2+mode1)
+	{
+		float32_t phase1, phase2;
+		phase1 = 0;
+		phase2 = phase;
+		while (phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 * 1.0 / max_index1 - 2) < 0) //- (max_index1) * 6 * 640.0 / FFT_LENGTH
+			phase1 += 360;
+		while (phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 * 1.0 / max_index1 - 2) >= 4096)
+			phase1 -= 360;
+		while (phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 * 1.0 / max_index1 - 2) < 0) //- (max_index1) * 6 * 640.0 / FFT_LENGTH
+			phase2 += 360;
+		while (phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 * 1.0 / max_index1 - 2) >= 4096)
+			phase2 -= 360;
+
+		// if (mod_max > 1550)
+			// if (mod_max > 1450 - 3 * (max_index1) * 640.0 / FFT_LENGTH)
+			// printf("%f sin\r\n", mod_max);
+		printf("255 %.0f %.0f %d %d %.0f %.0f\r\n", (max_index1) * 1000 * 640.0 / FFT_LENGTH,
+			   (max_index2) * 1000 * 640.0 / FFT_LENGTH,
+				mode1,
+				mode2,
+			   phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 * 1.0 / max_index1 - 2),
+			   phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 * 1.0 / max_index1 - 2));
+		// else
+		// 	// printf("%f triangle\r\n", mod_max);
+		// 	printf("255 %.0f %.0f 0 %.0f %.0f\r\n", (max_index1) * 1000 * 640.0 / FFT_LENGTH,
+		// 		    (max_index2) * 1000 * 640.0 / FFT_LENGTH,
+		// 		    phase1 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2),
+		// 		    phase2 * 4096.0 / 360 - 160 - 61.44 * (max_index2 / max_index1 - 2));
+
+		*index1 = max_index1;
+		*index2 = max_index2;
+		*deltaphase = phase;
+		*mode0 = mode1 + mode2*2;
+	}
 	// printf("%.0f\r\n", phase * 4096.0 / 360 - 160);
 	// angle = (q1[max_index2].imag + 0.5 * 3.1415926) - max_index2 / max_index1 * (q1[max_index1].imag + 0.5 * 3.1415926);
 	// while(angle < 0)

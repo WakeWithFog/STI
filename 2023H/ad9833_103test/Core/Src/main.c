@@ -65,7 +65,7 @@ uint32_t buf[1];
 int num = 0;
 int flag = 0;
 int i = 0;
-uint32_t freq1, freq2, phase1, phase2, wave, flag2;
+uint32_t freq1, freq2, phase1, phase2, wave1, wave2, flag2;
 
 /* USER CODE END PV */
 
@@ -114,7 +114,7 @@ int main(void)
   /*******************************************************************************************************/
   // printf("10000\n");
 
-  AD9833_WaveSeting_Double(10000, 10000, 0, SIN_WAVE, 0, 1920);
+  AD9833_WaveSeting_Double(10000, 10000, 0, SIN_WAVE, SIN_WAVE, 0, 1920);
   // AD9833_WaveSeting_Double(500000,0,SIN_WAVE,1030);
   /* USER CODE END 2 */
 
@@ -145,10 +145,11 @@ int main(void)
     {
       scanf("%d", &freq1);
       scanf("%d", &freq2);
-      scanf("%d", &wave);
+      scanf("%d", &wave1);
+      scanf("%d", &wave2);
       scanf("%d", &phase1);
       scanf("%d", &phase2);
-      AD9833_WaveSeting_Double(freq1, freq2, 0, wave, phase1, phase2);
+      AD9833_WaveSeting_Double(freq1, freq2, 0, wave1, wave2, phase1, phase2);
     }
     // printf("freq = %d", freq);
   }

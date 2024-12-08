@@ -195,7 +195,7 @@ void AD9833_WaveSeting(double Freq, unsigned int Freq_SFR, unsigned int WaveMode
 *	返 回 值: 无
 *********************************************************************************************************
 */
-void AD9833_WaveSeting_Double(double Freq0, double Freq1, unsigned int Freq_SFR, unsigned int WaveMode, unsigned int Phase0, unsigned int Phase1)
+void AD9833_WaveSeting_Double(double Freq0, double Freq1, unsigned int Freq_SFR, unsigned int WaveMode0, unsigned int WaveMode1, unsigned int Phase0, unsigned int Phase1)
 {
 
 	int frequence_LSB0, frequence_MSB0, frequence_LSB1, frequence_MSB1, Phs_data0, Phs_data1;
@@ -239,8 +239,8 @@ void AD9833_WaveSeting_Double(double Freq0, double Freq1, unsigned int Freq_SFR,
 		// 使用频率寄存器0输出波形
 		AD9833_Write(frequence_LSB0, 0); // L14，选择频率寄存器0的低14位数据输入
 		AD9833_Write(frequence_MSB0, 0); // H14 频率寄存器的高14位数据输入
-		AD9833_Write(Phs_data0, 0);		 // 设置相位
-		AD9833_Write(Phs_data1, 1);
+		AD9833_Write(Phs_data0, 0);		 // 设置相位0
+		AD9833_Write(Phs_data1, 1);		 // 设置相位1
 		AD9833_Write(frequence_LSB1, 1); // L14，选择频率寄存器0的低14位数据输入
 		AD9833_Write(frequence_MSB1, 1); // H14 频率寄存器的高14位数据输入
 		// AD9833_Write(0x2000); /**设置FSELECT位为0，芯片进入工作状态,频率寄存器0输出波形**/
@@ -254,26 +254,54 @@ void AD9833_WaveSeting_Double(double Freq0, double Freq1, unsigned int Freq_SFR,
 		// 使用频率寄存器1输出波形
 		AD9833_Write(frequence_LSB0, 0); // L14，选择频率寄存器1的低14位输入
 		AD9833_Write(frequence_MSB0, 0); // H14 频率寄存器1为
-		AD9833_Write(Phs_data0, 0);		 // 设置相位
-		AD9833_Write(Phs_data1, 1);
+		AD9833_Write(Phs_data0, 0);		 // 设置相位0
+		AD9833_Write(Phs_data1, 1);		 // 设置相位1
 		AD9833_Write(frequence_LSB1, 1); // L14，选择频率寄存器1的低14位输入
 		AD9833_Write(frequence_MSB1, 1); // H14 频率寄存器1为
 		// AD9833_Write(0x2800); /**设置FSELECT位为0，设置FSELECT位为1，即使用频率寄存器1的值，芯片进入工作状态,频率寄存器1输出波形**/
 	}
 
-	if (WaveMode == TRI_WAVE) // 输出三角波波形
+	// if (WaveMode == TRI_WAVE) // 输出三角波波形
+	// {
+	// 	AD9833_Write(0x2002, 0);
+	// 	AD9833_Write(0x2002, 1);
+	// }
+	// if (WaveMode == SQU_WAVE) // 输出方波波形
+	// {
+	// 	AD9833_Write(0x2028, 0);
+	// 	AD9833_Write(0x2028, 1);
+	// }
+	// if (WaveMode == SIN_WAVE) // 输出正弦波形
+	// {
+	// 	AD9833_Write(0x2000, 0);
+	// 	AD9833_Write(0x2000, 1);
+	// }
+	switch (WaveMode0)
 	{
+	case TRI_WAVE:
 		AD9833_Write(0x2002, 0);
-		AD9833_Write(0x2002, 1);
-	}
-	if (WaveMode == SQU_WAVE) // 输出方波波形
-	{
-		AD9833_Write(0x2028, 0);
-		AD9833_Write(0x2028, 1);
-	}
-	if (WaveMode == SIN_WAVE) // 输出正弦波形
-	{
+		break;
+	case SIN_WAVE:
 		AD9833_Write(0x2000, 0);
+		break;
+	case SQU_WAVE:
+		AD9833_Write(0x2028, 0);
+		break;
+	default:
+		break;
+	}
+	switch (WaveMode1)
+	{
+	case TRI_WAVE:
+		AD9833_Write(0x2002, 1);
+		break;
+	case SIN_WAVE:
 		AD9833_Write(0x2000, 1);
+		break;
+	case SQU_WAVE:
+		AD9833_Write(0x2028, 1);
+		break;
+	default:
+		break;
 	}
 }
